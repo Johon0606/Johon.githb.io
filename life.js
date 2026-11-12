@@ -117,9 +117,9 @@ const names={cash:'财富',health:'健康',relation:'关系',happy:'幸福感'};
 const clamp=n=>Math.max(0,Math.min(100,n));
 const money=n=>(n<0?'-':'')+'¥'+Math.abs(n).toLocaleString('zh-CN');
 const validRoute=n=>Number.isInteger(n)&&n>=0&&n<routes.length;
-const queryRoute=Number(new URLSearchParams(location.search).get('talent'));
-let route=validRoute(queryRoute)&&new URLSearchParams(location.search).has('talent')?queryRoute:null;
-try{if(route===null){const n=Number(localStorage.getItem(talentKey));if(validRoute(n)&&localStorage.getItem(talentKey)!==null)route=n}}catch{}
+const query=new URLSearchParams(location.search),queryRoute=Number(query.get('talent'));
+let route=null;
+try{const saved=localStorage.getItem(talentKey),n=Number(saved);if(saved!==null&&validRoute(n)&&(!query.has('talent')||n===queryRoute))route=n}catch{}
 let state=null;
 function save(){try{localStorage.setItem(key,JSON.stringify(state))}catch{$('saveStatus').textContent='当前环境无法保存进度，请一次玩完本章。';$('saveStatus').classList.remove('hidden')}}
 function load(){try{const s=JSON.parse(localStorage.getItem(key));if(s&&s.version===1&&validRoute(s.route)&&Number.isInteger(s.age)&&s.age>=18&&s.age<=24&&['choice','result','final'].includes(s.phase)&&Number.isFinite(s.cash)&&['health','relation','happy'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<=100)&&Array.isArray(s.history)&&s.history.length<=7&&(s.phase!=='result'||s.last&&typeof s.last.text==='string'&&Array.isArray(s.last.changes)))return s}catch{}return null}
